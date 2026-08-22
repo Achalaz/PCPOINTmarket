@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/Achalaz/PCPOINTmarket/issues"
   },
-  "homepage": "https://github.com/Achalaz/PCPOINTmarket#readme"
+  "homepage": "https://github.com/Achalaz/PCPOINTmarket#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }
