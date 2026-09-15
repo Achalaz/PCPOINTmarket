@@ -150,9 +150,11 @@ export default function Navbar({
                 alt={user?.full_name || 'Operator'}
                 className="navbar-avatar-img"
               />
-              <span className="navbar-username">{user?.full_name?.split(' ')[0] || 'Operator'}</span>
+              <span className="navbar-username">
+                <strong>{user?.full_name?.split(' ')[0] || 'Operator'}</strong>
+              </span>
               <span className={`auth-role-pill ${user?.role === 'admin' ? 'admin' : ''}`}>
-                {user?.role === 'admin' ? 'ADMIN' : 'AUTH'}
+                {user?.role === 'admin' ? '⚙ ADMIN' : '✓ USER'}
               </span>
               <span className="dropdown-caret">▾</span>
             </button>
@@ -160,11 +162,11 @@ export default function Navbar({
             {userDropdownOpen && (
               <div className="navbar-dropdown-panel" onClick={() => setUserDropdownOpen(false)}>
                 <div className="dropdown-user-header">
-                  <div className="dropdown-name">{user?.full_name}</div>
+                  <div className="dropdown-name"><strong>{user?.full_name}</strong></div>
                   <div className="dropdown-email">{user?.email}</div>
                   <div className="dropdown-status">
                     <span className="dot green" />
-                    <span>{user?.account_status || 'Active Member'}</span>
+                    <span><strong>● ONLINE</strong> · {user?.account_status || 'Active Member'}</span>
                   </div>
                 </div>
 

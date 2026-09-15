@@ -1541,9 +1541,14 @@ ul { list-style: none; }
 
 .navbar-username {
   font-family: var(--font-tech);
-  font-size: 0.85rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+}
+.navbar-username strong {
+  font-weight: 900;
 }
 
 .auth-role-pill {
@@ -1582,9 +1587,14 @@ ul { list-style: none; }
 }
 
 .dropdown-name {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text-main);
+  font-weight: 900;
+  font-size: 1rem;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 12px rgba(255,255,255,0.2);
+}
+.dropdown-name strong {
+  font-weight: 900;
 }
 
 .dropdown-email {
@@ -1804,6 +1814,35 @@ ul { list-style: none; }
   right: 14px;
   color: var(--text-muted);
   pointer-events: none;
+}
+
+/* Show / Hide password eye button */
+.password-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease, background 0.2s ease;
+  z-index: 2;
+}
+.password-eye-btn:hover {
+  color: var(--crimson);
+  background: rgba(255, 0, 51, 0.1);
+}
+.password-eye-btn:focus-visible {
+  outline: 1px solid var(--crimson);
+}
+/* Pad right side of password inputs to make room for the eye button */
+.input-icon-wrap input[type="password"],
+.input-icon-wrap input[type="text"].has-eye {
+  padding-right: 2.8rem;
 }
 
 .input-readonly {
@@ -3226,4 +3265,98 @@ ul { list-style: none; }
   }
 }
 
+/* ─────────────────────────────────────────────
+   PRODUCT IMAGE UPLOAD UI
+───────────────────────────────────────────── */
+
+/* Hidden native file input */
+.upload-file-input {
+  display: none;
+}
+
+/* Styled clickable label that triggers the file picker */
+.upload-file-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: #151520;
+  border: 1px dashed var(--crimson);
+  color: var(--text-muted);
+  font-family: var(--font-tech);
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.upload-file-label:hover {
+  background: rgba(255, 0, 51, 0.08);
+  border-color: #ff3355;
+  color: var(--text-main);
+}
+
+/* Image preview container */
+.upload-preview-box {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: #0d0d14;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.upload-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+/* Loading overlay while uploading */
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 7, 0.82);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-tech);
+  font-size: 0.8rem;
+  color: var(--neon-green);
+}
+
+/* Spinning animation for the upload indicator */
+.upload-spinner {
+  font-size: 1.8rem;
+  display: inline-block;
+  animation: spin-upload 0.9s linear infinite;
+}
+@keyframes spin-upload {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Upload status message (success / error) */
+.upload-status-msg {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-tech);
+  font-size: 0.75rem;
+  letter-spacing: 0.4px;
+}
+.upload-status-msg.ok {
+  color: var(--neon-green);
+}
+.upload-status-msg.err {
+  color: var(--crimson);
+}
 

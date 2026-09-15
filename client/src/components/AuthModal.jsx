@@ -1,6 +1,21 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
+/* ── Eye icon SVGs ── */
+const EyeOpen = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const EyeClosed = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
 export default function AuthModal({ isOpen, onClose, initialTab = 'login', returnUrl = null, onSuccess }) {
   const { login, register } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab); // 'login' | 'register'
@@ -13,6 +28,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
+
+  // Show/Hide password toggles
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirm, setShowRegConfirm] = useState(false);
 
   // UI status states
   const [loading, setLoading] = useState(false);
@@ -162,7 +182,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
           </div>
         )}
 
-        {/* LOGIN FORM */}
+        {/* ── LOGIN FORM ── */}
         {activeTab === 'login' && (
           <form className="auth-form" onSubmit={handleLoginSubmit}>
             <div className="auth-field">
@@ -186,14 +206,22 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
               <div className="input-icon-wrap">
                 <input
                   id="login-password"
-                  type="password"
+                  type={showLoginPassword ? 'text' : 'password'}
                   placeholder="••••••••••••"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   autoComplete="current-password"
                   required
                 />
-                <span className="field-glyph">🔑</span>
+                <button
+                  type="button"
+                  className="password-eye-btn"
+                  onClick={() => setShowLoginPassword((v) => !v)}
+                  aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                  title={showLoginPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showLoginPassword ? <EyeClosed /> : <EyeOpen />}
+                </button>
               </div>
             </div>
 
@@ -214,7 +242,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
           </form>
         )}
 
-        {/* REGISTRATION FORM */}
+        {/* ── REGISTRATION FORM ── */}
         {activeTab === 'register' && (
           <form className="auth-form" onSubmit={handleRegisterSubmit}>
             <div className="auth-field">
@@ -250,14 +278,25 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
 
             <div className="auth-field">
               <label htmlFor="reg-pass">CREATE STRONG PASSWORD</label>
-              <input
-                id="reg-pass"
-                type="password"
-                placeholder="Min 8 chars, Uppercase, Number, Symbol"
-                value={regPassword}
-                onChange={(e) => setRegPassword(e.target.value)}
-                required
-              />
+              <div className="input-icon-wrap">
+                <input
+                  id="reg-pass"
+                  type={showRegPassword ? 'text' : 'password'}
+                  placeholder="Min 8 chars, Uppercase, Number, Symbol"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-eye-btn"
+                  onClick={() => setShowRegPassword((v) => !v)}
+                  aria-label={showRegPassword ? 'Hide password' : 'Show password'}
+                  title={showRegPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showRegPassword ? <EyeClosed /> : <EyeOpen />}
+                </button>
+              </div>
 
               {/* Password Complexity Checklist */}
               <div className="password-checklist">
@@ -284,12 +323,21 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', retur
               <div className="input-icon-wrap">
                 <input
                   id="reg-confirm"
-                  type="password"
+                  type={showRegConfirm ? 'text' : 'password'}
                   placeholder="Re-type password exactly"
                   value={regConfirmPassword}
                   onChange={(e) => setRegConfirmPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  className="password-eye-btn"
+                  onClick={() => setShowRegConfirm((v) => !v)}
+                  aria-label={showRegConfirm ? 'Hide password' : 'Show password'}
+                  title={showRegConfirm ? 'Hide password' : 'Show password'}
+                >
+                  {showRegConfirm ? <EyeClosed /> : <EyeOpen />}
+                </button>
                 {regConfirmPassword.length > 0 && (
                   <span className={`validation-tag ${passwordsMatch ? 'valid' : 'invalid'}`}>
                     {passwordsMatch ? 'MATCH' : 'MISMATCH'}

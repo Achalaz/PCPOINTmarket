@@ -12,6 +12,7 @@ import profileRoutes from './server/routes/profile.js';
 import cartRoutes from './server/routes/cart.js';
 import productsRoutes from './server/routes/products.js';
 import adminRoutes from './server/routes/admin.js';
+import uploadRoutes from './server/routes/upload.js';
 
 dotenv.config();
 
@@ -47,6 +48,8 @@ app.use(cookieParser());
 
 // Static legacy assets
 app.use(express.static(path.join(__dirname, 'public')));
+// Serve uploaded product images
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // Health Check & Diagnostics API
 app.get('/api/health', (req, res) => {
@@ -75,6 +78,9 @@ app.use('/api/products', productsRoutes);
 
 // Admin Control Center Routes (Users & Sales Reporting)
 app.use('/api/admin', adminRoutes);
+
+// Product Image Upload Route
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler for undefined API routes
 app.use('/api', (req, res) => {

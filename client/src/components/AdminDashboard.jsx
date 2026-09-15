@@ -28,6 +28,12 @@ export default function AdminDashboard({ onNavigateHome }) {
   const [addLoading, setAddLoading] = useState(false);
   const [addMsg, setAddMsg] = useState('');
 
+  // Image upload state
+  const [imgFile, setImgFile] = useState(null);
+  const [imgPreview, setImgPreview] = useState('/laptop_1787633700695.jpg');
+  const [imgUploading, setImgUploading] = useState(false);
+  const [imgUploadMsg, setImgUploadMsg] = useState('');
+
   // Users State
   const [usersList, setUsersList] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
@@ -152,6 +158,43 @@ export default function AdminDashboard({ onNavigateHome }) {
     }
   };
 
+  // Handle image file selection & upload
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show local preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setImgPreview(localUrl);
+    setImgFile(file);
+    setImgUploadMsg('');
+
+    try {
+      setImgUploading(true);
+      const formData = new FormData();
+      formData.append('productImage', file);
+
+      const res = await fetch('/api/upload/product-image', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewProdImg(data.url);   // server-side path saved to DB
+        setImgPreview(data.url);  // update preview to server path
+        setImgUploadMsg(`✓ Uploaded: ${file.name}`);
+      } else {
+        setImgUploadMsg(`⚠ Upload failed: ${data.message}`);
+        setNewProdImg('/laptop_1787633700695.jpg');
+      }
+    } catch (err) {
+      setImgUploadMsg('⚠ Network error during upload.');
+    } finally {
+      setImgUploading(false);
+    }
+  };
+
   // Add Product Submit
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -196,6 +239,10 @@ export default function AdminDashboard({ onNavigateHome }) {
         setNewProdOldPrice('');
         setNewProdSpecs('');
         setNewProdDesc('');
+        setNewProdImg('/laptop_1787633700695.jpg');
+        setImgPreview('/laptop_1787633700695.jpg');
+        setImgFile(null);
+        setImgUploadMsg('');
       } else {
         setAddMsg(data.message || 'Failed to add product.');
       }
@@ -858,19 +905,42 @@ export default function AdminDashboard({ onNavigateHome }) {
                   />
                 </div>
                 <div className="auth-field">
-                  <label>IMAGE URL / ASSET</label>
-                  <select
-                    value={newProdImg}
-                    onChange={(e) => setNewProdImg(e.target.value)}
-                    className="admin-cat-select"
-                  >
-                    <option value="/laptop_1787633700695.jpg">Gaming Laptop Visual</option>
-                    <option value="/gpu_1787633713974.jpg">Graphics Card Visual</option>
-                    <option value="/pc_1787633742711.jpg">Desktop Rig / CPU Visual</option>
-                    <option value="/monitor_1787633728962.jpg">Ultra-Wide Monitor Visual</option>
-                    <option value="/blueprint_1787633759905.jpg">Blueprint Component Visual</option>
-                    <option value="/media_1787635462982.jpg">Peripherals Visual</option>
-                  </select>
+                  <label>PRODUCT IMAGE</label>
+
+                  {/* Live Image Preview */}
+                  <div className="upload-preview-box">
+                    <img
+                      src={imgPreview}
+                      alt="Product preview"
+                      className="upload-preview-img"
+                      onError={(e) => { e.target.src = '/laptop_1787633700695.jpg'; }}
+                    />
+                    {imgUploading && (
+                      <div className="upload-overlay">
+                        <span className="upload-spinner">⟳</span>
+                        <span>Uploading...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* File Input */}
+                  <label htmlFor="prod-img-upload" className="upload-file-label">
+                    📁 {imgFile ? imgFile.name : 'Choose Photo (JPG / PNG / WEBP)'}
+                  </label>
+                  <input
+                    id="prod-img-upload"
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/avif"
+                    onChange={handleImageUpload}
+                    className="upload-file-input"
+                    disabled={imgUploading}
+                  />
+
+                  {imgUploadMsg && (
+                    <span className={`upload-status-msg ${imgUploadMsg.startsWith('✓') ? 'ok' : 'err'}`}>
+                      {imgUploadMsg}
+                    </span>
+                  )}
                 </div>
               </div>
 
