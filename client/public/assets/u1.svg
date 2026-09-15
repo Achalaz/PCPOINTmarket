@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0033" />
+      <stop offset="100%" stop-color="#7a0018" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b1b24" />
+      <stop offset="100%" stop-color="#0b0b0f" />
+    </linearGradient>
+  </defs>
+  <!-- Base frame -->
+  <circle cx="50" cy="50" r="48" fill="url(#bgGrad)" stroke="#ff0033" stroke-width="2.5" />
+  <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a38" stroke-width="1.5" stroke-dasharray="6,4" />
+  
+  <!-- Tactical Visor / Head -->
+  <path d="M50 20 C36 20 30 28 30 42 C30 52 38 60 50 60 C62 60 70 52 70 42 C70 28 64 20 50 20 Z" fill="#252533" stroke="#ff0033" stroke-width="1.5" />
+  <!-- Glowing Visor Eye -->
+  <polygon points="36,38 64,38 60,46 40,46" fill="url(#cyberGrad)" />
+  <circle cx="50" cy="42" r="2.5" fill="#ffffff" />
+  
+  <!-- Tactical Armor Collar -->
+  <path d="M22 84 C26 70 38 64 50 64 C62 64 74 70 78 84" fill="none" stroke="#ff0033" stroke-width="3" stroke-linecap="round" />
+  <polygon points="46,67 54,67 52,73 48,73" fill="#ff0033" />
+  
+  <!-- Tech crosshairs -->
+  <line x1="50" y1="4" x2="50" y2="12" stroke="#ff0033" stroke-width="2" />
+  <line x1="50" y1="88" x2="50" y2="96" stroke="#ff0033" stroke-width="2" />
+  <line x1="4" y1="50" x2="12" y2="50" stroke="#ff0033" stroke-width="2" />
+  <line x1="88" y1="50" x2="96" y2="50" stroke="#ff0033" stroke-width="2" />
+</svg>
