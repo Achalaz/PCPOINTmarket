@@ -11,11 +11,12 @@ import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import ProfileDashboard from './components/ProfileDashboard';
 import CheckoutView from './components/CheckoutView';
+import AdminDashboard from './components/AdminDashboard';
 
 function MainApp() {
   const { user, isAuthenticated, syncGuestCart } = useAuth();
 
-  // Navigation view state: 'home' | 'profile' | 'checkout'
+  // Navigation view state: 'home' | 'profile' | 'checkout' | 'admin'
   const [currentView, setCurrentView] = useState('home');
 
   // Cart state persisted in localStorage
@@ -99,6 +100,22 @@ function MainApp() {
           setCurrentView('checkout');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+      } else if (hash === '#admin') {
+        if (!isAuthenticated) {
+          setPendingReturnUrl('#admin');
+          setAuthModalOpen(true);
+          setAuthModalTab('login');
+          triggerToast('🔒 ACCESS GUARD: Please authenticate to access Operations Command Center.');
+          window.location.hash = '#home';
+          setCurrentView('home');
+        } else if (user?.role !== 'admin') {
+          triggerToast('⚠️ RESTRICTED CLEARANCE: High-Clearance Administrator privilege required.');
+          window.location.hash = '#home';
+          setCurrentView('home');
+        } else {
+          setCurrentView('admin');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       } else {
         setCurrentView('home');
       }
@@ -108,7 +125,7 @@ function MainApp() {
     handleHashChange(); // initial run
 
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   // Cart operations
   const handleAddToCart = (product) => {
@@ -181,6 +198,21 @@ function MainApp() {
     }
   };
 
+  const navigateToAdmin = () => {
+    if (!isAuthenticated) {
+      setPendingReturnUrl('#admin');
+      setAuthModalOpen(true);
+      setAuthModalTab('login');
+      triggerToast('🔒 ACCESS GUARD: Please authenticate as Administrator.');
+    } else if (user?.role !== 'admin') {
+      triggerToast('⚠️ RESTRICTED CLEARANCE: Administrator privilege required.');
+    } else {
+      window.location.hash = '#admin';
+      setCurrentView('admin');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleAuthSuccess = (returnUrl) => {
     triggerToast(`✓ Authenticated as ${user?.full_name || 'Operator'}`);
     if (returnUrl) {
@@ -204,6 +236,7 @@ function MainApp() {
           setAuthModalOpen(true);
         }}
         onNavigateProfile={navigateToProfile}
+        onNavigateAdmin={navigateToAdmin}
         onNavigateHome={navigateToHome}
       />
 
@@ -252,6 +285,10 @@ function MainApp() {
           onNavigateHome={navigateToHome}
           onClearCart={handleClearCart}
         />
+      )}
+
+      {currentView === 'admin' && (
+        <AdminDashboard onNavigateHome={navigateToHome} />
       )}
 
       <Footer />

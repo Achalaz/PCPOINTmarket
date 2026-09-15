@@ -8,6 +8,7 @@ export default function Navbar({
   onOpenCart,
   onOpenAuth,
   onNavigateProfile,
+  onNavigateAdmin,
   onNavigateHome,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -127,6 +128,16 @@ export default function Navbar({
         </button>
 
         {/* Authentication Navigation State */}
+        {isAuthenticated && user?.role === 'admin' && (
+          <button
+            className="btn btn-secondary btn-sm nav-admin-btn"
+            onClick={onNavigateAdmin}
+            title="Open Operations & Logistics Command Center"
+          >
+            ⚙ COMMAND
+          </button>
+        )}
+
         {isAuthenticated ? (
           <div className="navbar-user-profile-menu">
             <button
@@ -140,7 +151,9 @@ export default function Navbar({
                 className="navbar-avatar-img"
               />
               <span className="navbar-username">{user?.full_name?.split(' ')[0] || 'Operator'}</span>
-              <span className="auth-role-pill">AUTH</span>
+              <span className={`auth-role-pill ${user?.role === 'admin' ? 'admin' : ''}`}>
+                {user?.role === 'admin' ? 'ADMIN' : 'AUTH'}
+              </span>
               <span className="dropdown-caret">▾</span>
             </button>
 
@@ -156,6 +169,19 @@ export default function Navbar({
                 </div>
 
                 <div className="dropdown-divider" />
+
+                {user?.role === 'admin' && (
+                  <button
+                    className="dropdown-item text-crimson font-bold"
+                    onClick={() => {
+                      onNavigateAdmin();
+                      setUserDropdownOpen(false);
+                    }}
+                  >
+                    <span>⚙ Operations Command</span>
+                    <span className="item-arrow">→</span>
+                  </button>
+                )}
 
                 <button
                   className="dropdown-item"

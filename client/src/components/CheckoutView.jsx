@@ -12,10 +12,29 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
   const totalCartPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
   const formatLKR = (num) => 'Rs. ' + (num || 0).toLocaleString('en-US');
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     const id = 'ORD-2026-' + Math.floor(100000 + Math.random() * 900000);
     setOrderId(id);
+
+    try {
+      await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: id,
+          customer_name: user?.full_name || 'Valued Operator',
+          customer_email: user?.email || 'operator@pcpoint.lk',
+          items: cart,
+          total_amount: totalCartPrice,
+          payment_method: paymentMethod,
+          shipping_address: profile?.shipping_address || {},
+        }),
+      });
+    } catch (err) {
+      console.warn('Failed to record order to sales backend:', err);
+    }
+
     setOrderPlaced(true);
     if (onClearCart) onClearCart();
   };
