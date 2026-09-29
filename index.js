@@ -13,6 +13,7 @@ import cartRoutes from './server/routes/cart.js';
 import productsRoutes from './server/routes/products.js';
 import adminRoutes from './server/routes/admin.js';
 import uploadRoutes from './server/routes/upload.js';
+import payhereRoutes from './server/routes/payhere.js';
 
 dotenv.config();
 
@@ -81,6 +82,9 @@ app.use('/api/admin', adminRoutes);
 
 // Product Image Upload Route
 app.use('/api/upload', uploadRoutes);
+
+// PayHere Payment Gateway Routes
+app.use('/api/payhere', payhereRoutes);
 
 // 404 handler for undefined API routes
 app.use('/api', (req, res) => {

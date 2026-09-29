@@ -12,11 +12,7 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
   const totalCartPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
   const formatLKR = (num) => 'Rs. ' + (num || 0).toLocaleString('en-US');
 
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-    const id = 'ORD-2026-' + Math.floor(100000 + Math.random() * 900000);
-    setOrderId(id);
-
+  const finalizeOrder = async (id, method) => {
     try {
       await fetch('/api/admin/orders', {
         method: 'POST',
@@ -27,7 +23,7 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
           customer_email: user?.email || 'operator@pcpoint.lk',
           items: cart,
           total_amount: totalCartPrice,
-          payment_method: paymentMethod,
+          payment_method: method,
           shipping_address: profile?.shipping_address || {},
         }),
       });
@@ -37,6 +33,70 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
 
     setOrderPlaced(true);
     if (onClearCart) onClearCart();
+  };
+
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    const id = 'ORD-2026-' + Math.floor(100000 + Math.random() * 900000);
+    setOrderId(id);
+
+    if (paymentMethod === 'payhere') {
+      // ── Fetch hash securely from backend (merchant secret stays on server) ──
+      let hashData;
+      try {
+        const res = await fetch('/api/payhere/hash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: id,
+            amount: totalCartPrice,
+            currency: 'LKR',
+          }),
+        });
+        hashData = await res.json();
+      } catch (err) {
+        console.error('Failed to get PayHere hash:', err);
+        alert('Payment initiation failed. Please try again.');
+        return;
+      }
+
+      const payment = {
+        sandbox:     hashData.sandbox,
+        merchant_id: hashData.merchant_id,
+        return_url:  'http://localhost:5173',
+        cancel_url:  'http://localhost:5173',
+        notify_url:  'http://localhost:5000/api/payhere/notify',
+        order_id:    id,
+        items:       'PC Components',
+        amount:      totalCartPrice,
+        currency:    'LKR',
+        hash:        hashData.hash,
+        first_name:  user?.full_name?.split(' ')[0] || 'John',
+        last_name:   user?.full_name?.split(' ').slice(1).join(' ') || 'Doe',
+        email:       user?.email || 'operator@pcpoint.lk',
+        phone:       profile?.phone || '0771234567',
+        address:     profile?.shipping_address?.street || 'No. 1, Galle Road',
+        city:        profile?.shipping_address?.city || 'Colombo',
+        country:     'Sri Lanka',
+      };
+
+      if (window.payhere) {
+        window.payhere.onCompleted = function onCompleted() {
+          finalizeOrder(id, 'payhere');
+        };
+        window.payhere.onDismissed = function onDismissed() {
+          console.log('Payment dismissed');
+        };
+        window.payhere.onError = function onError(error) {
+          console.log('Payment error', error);
+        };
+        window.payhere.startPayment(payment);
+      } else {
+        alert('PayHere initialization failed.');
+      }
+    } else {
+      finalizeOrder(id, paymentMethod);
+    }
   };
 
   if (orderPlaced) {
@@ -122,19 +182,19 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
                   </div>
                 </label>
 
-                <label className={`payment-card ${paymentMethod === 'card' ? 'selected' : ''}`}>
+                <label className={`payment-card ${paymentMethod === 'payhere' ? 'selected' : ''}`}>
                   <input
                     type="radio"
                     name="payment"
-                    value="card"
-                    checked={paymentMethod === 'card'}
-                    onChange={() => setPaymentMethod('card')}
+                    value="payhere"
+                    checked={paymentMethod === 'payhere'}
+                    onChange={() => setPaymentMethod('payhere')}
                   />
                   <div className="pay-card-content">
                     <span className="pay-icon">💳</span>
                     <div>
-                      <strong>Credit / Debit Card</strong>
-                      <p>Visa, MasterCard, Amex (IPG Secured)</p>
+                      <strong>PayHere Secure Payment</strong>
+                      <p>Visa, MasterCard, Amex (Sandbox Mode)</p>
                     </div>
                   </div>
                 </label>
