@@ -10,12 +10,19 @@ export default function Navbar({
   onNavigateProfile,
   onNavigateAdmin,
   onNavigateHome,
+  onNavigateBuilder,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   const handleNavClick = (link, e) => {
+    if (link.href === '#builder' || link.label === 'Build My PC') {
+      e.preventDefault();
+      if (onNavigateBuilder) onNavigateBuilder();
+      setMobileMenuOpen(false);
+      return;
+    }
     if (link.category && onCategorySelect) {
       e.preventDefault();
       onNavigateHome();

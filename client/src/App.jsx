@@ -12,11 +12,13 @@ import AuthModal from './components/AuthModal';
 import ProfileDashboard from './components/ProfileDashboard';
 import CheckoutView from './components/CheckoutView';
 import AdminDashboard from './components/AdminDashboard';
+import PCBuilder from './components/PCBuilder';
+import './pcbuilder.css';
 
 function MainApp() {
   const { user, isAuthenticated, syncGuestCart } = useAuth();
 
-  // Navigation view state: 'home' | 'profile' | 'checkout' | 'admin'
+  // Navigation view state: 'home' | 'profile' | 'checkout' | 'admin' | 'builder'
   const [currentView, setCurrentView] = useState('home');
 
   // Cart state persisted in localStorage
@@ -116,6 +118,9 @@ function MainApp() {
           setCurrentView('admin');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+      } else if (hash === '#builder') {
+        setCurrentView('builder');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         setCurrentView('home');
       }
@@ -168,6 +173,12 @@ function MainApp() {
   const navigateToHome = () => {
     window.location.hash = '#home';
     setCurrentView('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToBuilder = () => {
+    window.location.hash = '#builder';
+    setCurrentView('builder');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -238,6 +249,7 @@ function MainApp() {
         onNavigateProfile={navigateToProfile}
         onNavigateAdmin={navigateToAdmin}
         onNavigateHome={navigateToHome}
+        onNavigateBuilder={navigateToBuilder}
       />
 
       {/* Floating Tactical Toast Banner */}
@@ -265,7 +277,7 @@ function MainApp() {
               onSelectCategory={(cat) => setSelectedCategory(cat)}
               onAddToCart={handleAddToCart}
             />
-            <Configurator />
+            <Configurator onNavigateBuilder={navigateToBuilder} />
             <Diagnostics />
             <Logs />
           </main>
@@ -289,6 +301,13 @@ function MainApp() {
 
       {currentView === 'admin' && (
         <AdminDashboard onNavigateHome={navigateToHome} />
+      )}
+
+      {currentView === 'builder' && (
+        <PCBuilder
+          onNavigateHome={navigateToHome}
+          onAddToCart={handleAddToCart}
+        />
       )}
 
       <Footer />

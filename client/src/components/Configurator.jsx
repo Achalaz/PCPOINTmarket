@@ -1,6 +1,6 @@
 import { IMAGES } from '../data';
 
-export default function Configurator() {
+export default function Configurator({ onNavigateBuilder }) {
   return (
     <section className="configurator-section">
       <div className="config-container">
@@ -30,7 +30,12 @@ export default function Configurator() {
             readouts automatically.
           </p>
           <div className="config-actions">
-            <a href="#" className="btn btn-primary">LAUNCH CONFIGURATOR →</a>
+            <button
+              className="btn btn-primary"
+              onClick={onNavigateBuilder}
+            >
+              LAUNCH CONFIGURATOR →
+            </button>
             <a href="#" className="btn btn-outline">WATCH VIDEO GUIDE</a>
           </div>
         </div>
