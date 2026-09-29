@@ -66,6 +66,50 @@ router.post('/product-image', requireAdmin, upload.single('productImage'), (req,
   });
 });
 
+import { authenticateToken } from '../middleware/auth.js';
+
+// Multer disk storage for avatars
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const avatarDir = path.join(__dirname, '../../public/uploads/avatars');
+    // Ensure dir exists
+    import('fs').then(fs => {
+      if (!fs.existsSync(avatarDir)) {
+        fs.mkdirSync(avatarDir, { recursive: true });
+      }
+      cb(null, avatarDir);
+    });
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueName = `avatar_${Date.now()}_${Math.floor(Math.random() * 9999)}${ext}`;
+    cb(null, uniqueName);
+  },
+});
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+});
+
+/**
+ * POST /api/upload/avatar
+ * Multipart form-data field: "avatar"
+ */
+router.post('/avatar', authenticateToken, uploadAvatar.single('avatar'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No image file received.' });
+  }
+  const publicUrl = `/uploads/avatars/${req.file.filename}`;
+  return res.status(200).json({
+    success: true,
+    message: 'Avatar uploaded successfully.',
+    url: publicUrl,
+  });
+});
+
+
 // Multer error handler
 router.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {

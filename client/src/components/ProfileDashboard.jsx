@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProfileDashboard({ onNavigateHome, onOpenCart }) {
-  const { user, profile, updateProfile, changePassword, logout } = useAuth();
+  const { user, profile, updateProfile, changePassword, logout, uploadAvatar } = useAuth();
+
+  const fileInputRef = useRef(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   // Contact details form state
   const [fullName, setFullName] = useState('');
@@ -105,6 +108,30 @@ export default function ProfileDashboard({ onNavigateHome, onOpenCart }) {
     }
   };
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    setProfileError('');
+    try {
+      const uploadRes = await uploadAvatar(file);
+      if (uploadRes.success && uploadRes.url) {
+        await updateProfile({ avatar: uploadRes.url });
+        setProfileSuccess('Avatar updated successfully.');
+        setTimeout(() => setProfileSuccess(''), 4000);
+      }
+    } catch (err) {
+      setProfileError(err.message || 'Failed to upload avatar.');
+      setTimeout(() => setProfileError(''), 4000);
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setPasswordLoading(true);
@@ -171,9 +198,22 @@ export default function ProfileDashboard({ onNavigateHome, onOpenCart }) {
 
         {/* Hero Card / Callsign Banner */}
         <div className="profile-hero-card">
-          <div className="profile-avatar-wrap">
-            <img src={user?.avatar || '/assets/u1.svg'} alt="Operator Avatar" className="profile-avatar-img" />
+          <div 
+            className="profile-avatar-wrap" 
+            style={{ cursor: 'pointer', position: 'relative' }}
+            onClick={() => fileInputRef.current?.click()}
+            title="Click to update avatar"
+          >
+            <img src={user?.avatar || '/assets/u1.svg'} alt="Operator Avatar" className="profile-avatar-img" style={{ opacity: avatarUploading ? 0.5 : 1 }} />
+            {avatarUploading && <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', textShadow: '0 0 5px black', fontWeight: 'bold'}}>Uploading...</div>}
             <span className="avatar-rank-badge">OP-1</span>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleAvatarChange} 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+            />
           </div>
 
           <div className="profile-identity">

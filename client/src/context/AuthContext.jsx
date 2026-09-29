@@ -185,6 +185,27 @@ export function AuthProvider({ children }) {
     return null;
   };
 
+  // Upload avatar
+  const uploadAvatar = async (file) => {
+    if (!token) throw new Error('Not authenticated.');
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const res = await fetch('/api/upload/avatar', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Failed to upload avatar.');
+    }
+    return data;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -200,6 +221,7 @@ export function AuthProvider({ children }) {
         updateProfile,
         changePassword,
         syncGuestCart,
+        uploadAvatar,
       }}
     >
       {children}
