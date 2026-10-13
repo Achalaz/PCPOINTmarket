@@ -60,12 +60,16 @@ export default function CheckoutView({ cart = [], onNavigateHome, onClearCart })
         return;
       }
 
+      // Derive URLs dynamically — works on localhost and on Vercel (same domain)
+      const siteOrigin   = window.location.origin;
+      const apiOrigin    = import.meta.env.VITE_API_BASE_URL || siteOrigin;
+
       const payment = {
         sandbox:     hashData.sandbox,
         merchant_id: hashData.merchant_id,
-        return_url:  'http://localhost:5173',
-        cancel_url:  'http://localhost:5173',
-        notify_url:  'http://localhost:5000/api/payhere/notify',
+        return_url:  siteOrigin,
+        cancel_url:  siteOrigin,
+        notify_url:  `${apiOrigin}/api/payhere/notify`,
         order_id:    id,
         items:       'PC Components',
         amount:      totalCartPrice,

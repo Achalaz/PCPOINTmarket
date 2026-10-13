@@ -38,6 +38,9 @@ app.use(
       'http://127.0.0.1:5173',
       'http://127.0.0.1:5174',
       process.env.CLIENT_URL,
+      // Vercel injects VERCEL_URL (deployment) and VERCEL_BRANCH_URL (branch)
+      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+      process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : undefined,
     ].filter(Boolean),
     credentials: true,
   })
